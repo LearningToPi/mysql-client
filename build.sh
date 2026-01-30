@@ -3,6 +3,7 @@
 source ./vars.sh
 
 VERSION=$1
+MYSQL_VERSION=$2
 
 ARCH=$(
     case "$UNAME_ARCH" in
@@ -20,13 +21,10 @@ if [ "${RETCODE}" -ne 0 ] ; then
     quit $RETCODE
 fi
 
-IMAGE_DISTRO=`docker image inspect ${SOURCE_DISTRO}:${SOURCE_TAG} -f '{{index .Config.Labels "org.opencontainers.image.ref.name"}}'`
-IMAGE_VERSION=`docker image inspect ${SOURCE_DISTRO}:${SOURCE_TAG} -f '{{index .Config.Labels "org.opencontainers.image.version"}}'`
-
 echo ""
 echo "Pulled ${IMAGE_DISTRO}:${IMAGE_VERSION}"
 
-docker build -f Containerfile . -t $REGISTRY/$PACKAGE:${VERSION}-$ARCH -t $REGISTRY/$PACKAGE:latest-$ARCH --build-arg SOURCE_DISTRO="${IMAGE_DISTRO}" --build-arg SOURCE_TAG="${IMAGE_VERSION}" --build-arg BUILD_VERSION="${VERSION}" 
+docker build -f Containerfile . -t $REGISTRY/$PACKAGE:${VERSION}-$ARCH -t $REGISTRY/$PACKAGE:latest-$ARCH --build-arg SOURCE_DISTRO="${SOURCE_DISTRO}" --build-arg SOURCE_TAG="${SOURCE_TAG}" --build-arg BUILD_VERSION="${VERSION}" --build-arg MYSQL_VERSION="${MYSQL_VERSION}"
 RETCODE=$?
 
 if [ "${RETCODE}" -ne 0 ] ; then
